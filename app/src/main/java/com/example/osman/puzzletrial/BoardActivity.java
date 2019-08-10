@@ -26,7 +26,8 @@ public class BoardActivity extends AppCompatActivity {
     private TextView countText;
     private Button backButton;
     private String mod;
-
+    String allHistory;
+    int gameCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class BoardActivity extends AppCompatActivity {
         setBoard();
         createInitialTimer();
         createGameTimer();
-        Toast.makeText(this,"Status: Board Created", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"Status: Board Create", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -45,7 +46,7 @@ public class BoardActivity extends AppCompatActivity {
 
         timer.start();
         gameTimer.start();
-        Toast.makeText(this,"Status: Board Started", Toast.LENGTH_SHORT).show();
+       //Toast.makeText(this,"Status: Board Start", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -54,19 +55,19 @@ public class BoardActivity extends AppCompatActivity {
 
         setClickEventForButtons();
         resumeTimer();
-        Toast.makeText(this,"Status: Board Resumed", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"Status: Board Resume", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Toast.makeText(this,"Status: Board Paused", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"Status: Board Pause", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Toast.makeText(this,"Status: Board Stoped", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"Status: Board Stop", Toast.LENGTH_SHORT).show();
     }
 
     public void setBoard(){
@@ -102,18 +103,19 @@ public class BoardActivity extends AppCompatActivity {
         LinearLayout.LayoutParams buttonStyle = new LinearLayout.LayoutParams
                 (LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
-        buttonStyle.setMargins(400,20,20,20);
+        buttonStyle.setMargins(20,20,20,20);
         buttonStyle.gravity = Gravity.CENTER;
 
         Intent myIntent = getIntent();
         n = myIntent.getIntExtra("BoardSize", 0);
-
         mod = myIntent.getStringExtra("Level");
+        gameCount = myIntent.getIntExtra("GameCount",0);
+        allHistory = myIntent.getStringExtra("AllHistory");
 
         if (mod.contains("Easy")) {
-            level = 5;
+            level = 4;
         }
-            else if (mod == "Normal") {
+        else if (mod.contains("Normal")) {
             level = 2;
         }
 
@@ -146,7 +148,7 @@ public class BoardActivity extends AppCompatActivity {
             for (int j = 0; j < n; j++) {
                 Button btn = new Button(this);
                 btn.setText(Character.toString(symbols[k++]));
-                btn.setLayoutParams(new LinearLayout.LayoutParams(80, 100));
+                btn.setLayoutParams(new LinearLayout.LayoutParams(90, 90));
                 btn.setTextSize(15);
                 myLayout.addView(btn);
                 board[i][j] = btn;
@@ -224,7 +226,7 @@ public class BoardActivity extends AppCompatActivity {
                                                            btn1 = current;
                                                            current.setText(btn1.getTag().toString());
                                                        }
-                                                       else if (btn2 == null && btn1 != btn2) {
+                                                       else if (btn2 == null && btn1 != btn2 && current != btn1) {
                                                            btn2 = current;
                                                            current.setText(btn2.getTag().toString());
 
@@ -239,7 +241,10 @@ public class BoardActivity extends AppCompatActivity {
                                                            }
                                                            moveCount++;
                                                        }
-                                                       countText.setText("Count: " +correctCount +"/"+ moveCount);
+                                                       if (n*(n/2) != correctCount){
+                                                       countText.setText("Count: " +correctCount +"/"+ moveCount);}
+                                                       else{
+                                                           countText.setText("WIN !\r\nClick Back");}
                                                    }
                                                }
                 );
@@ -249,16 +254,14 @@ public class BoardActivity extends AppCompatActivity {
 
     private void sendCalculatedValues(){
         Intent myIntent = new Intent(this, MainActivity.class);
+
+        String minuteSecond = (time / 60 +":" + time % 60);
+        myIntent.putExtra("PuzzleSize",n);
+        myIntent.putExtra("MoveCount",moveCount);
+        myIntent.putExtra("GameTime",minuteSecond);
+        myIntent.putExtra("GameCount",gameCount);
+        myIntent.putExtra("AllHistory",allHistory);
+
         startActivity(myIntent);
-
-        if (n == correctCount){
-            String minuteSecond = (time / 60 +":" + time % 60);
-            myIntent.putExtra("PuzzleSize",n);
-            myIntent.putExtra("MoveCount",moveCount);
-            myIntent.putExtra("GameTime",minuteSecond);
-        }
-
-        startActivity(myIntent);
-
     }
 }
